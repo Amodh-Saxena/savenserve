@@ -34,11 +34,11 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Mock data for Food Listings
-  const foodListings = [
-    { id: 1, type: "Fresh Bakery Items", qty: "15 kg", dist: "1.2 km", time: "Pickup by 5 PM", urgency: "High" },
-    { id: 2, type: "Catered Hot Meals", qty: "50 servings", dist: "3.5 km", time: "Pickup by 2 PM", urgency: "Medium" },
-    { id: 3, type: "Organic Vegetables", qty: "20 kg", dist: "0.8 km", time: "Pickup by 8 PM", urgency: "Low" },
+  // Mock data for NGO Listings (Chennai)
+  const ngoListings = [
+    { id: 1, name: "Bhumi", category: "Child Welfare", mission: "Education programs & volunteering", dist: "1.2 km", website: "https://bhumi.ngo/" },
+    { id: 2, name: "United Way", category: "Rural Dev", mission: "Supports education & rural development", dist: "3.5 km", website: "https://unitedwaychennai.org/" },
+    { id: 3, name: "Team Everest", category: "Education", mission: "Academic support & skill training", dist: "0.8 km", website: "https://www.teameverest.india/" },
   ];
 
   return (
@@ -164,59 +164,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. Food Listings Preview */}
-      <section className="py-24 bg-cream" id="listings">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-black text-dark tracking-tight mb-4">NGOs near you, in Chennai</h2>
-              <p className="text-xl text-gray-600 font-medium">Real-time surplus food waiting to be rescued across the city.</p>
-            </div>
-            <Link to="/auth" className="hidden md:inline-flex items-center font-black text-primary-dark hover:text-primary transition-colors">
-              View all listings <ChevronRight className="ml-1" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {foodListings.map((food, i) => (
-              <motion.div 
-                key={food.id}
-                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-3xl p-6 border border-gray-100 shadow-md hover:shadow-xl transition-all group flex flex-col"
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <div className="px-3 py-1 bg-cream-dark rounded-full text-xs font-bold text-gray-600 border border-gray-200">
-                    {food.dist} away
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${
-                    food.urgency === 'High' ? 'bg-red-50 text-red-600 border-red-100' : 
-                    food.urgency === 'Medium' ? 'bg-orange-50 text-orange-600 border-orange-100' : 
-                    'bg-green-50 text-green-600 border-green-100'
-                  }`}>
-                    {food.urgency} Urgency
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-black text-dark mb-2 group-hover:text-primary-dark transition-colors">{food.type}</h3>
-                <div className="text-4xl font-black text-secondary-dark mb-6">{food.qty}</div>
-                
-                <div className="space-y-3 mb-8 flex-1">
-                  <div className="flex items-center text-gray-500 font-medium">
-                    <Clock size={18} className="mr-3 text-gray-400" /> {food.time}
-                  </div>
-                  <div className="flex items-center text-gray-500 font-medium">
-                    <MapPin size={18} className="mr-3 text-gray-400" /> Downtown Area
-                  </div>
-                </div>
-
-                <Link to="/auth" className="w-full block text-center py-4 rounded-xl bg-gray-50 text-dark font-black border border-gray-200 hover:bg-primary hover:border-primary hover:text-white transition-all">
-                  Request Food
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+>
 
       {/* 5. How It Works */}
       <section className="py-24 bg-white border-y border-gray-100" id="how-it-works">
@@ -284,103 +232,63 @@ export default function LandingPage() {
             { id: "efi", name: "EFI", email: "info@indiaenvironment.org", location: "Environmental Conservation", website: "https://indiaenvironment.org/", lat: 12.9815, lng: 80.2184 }
           ]} />
 
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                <h4 className="text-xl font-black text-dark mb-4 flex items-center gap-2">
-                    <span>👶</span> Child Welfare & Education
+
+
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="space-y-6">
+                <h4 className="text-2xl font-black text-dark flex items-center gap-3">
+                    <span className="text-3xl">👶</span> Child Welfare & Education NGOs
                 </h4>
-                <div className="space-y-4">
-                    <div>
-                        <a href="https://bhumi.ngo/" target="_blank" className="font-bold text-primary-dark hover:underline flex items-center gap-2">Bhumi <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Education programs & volunteering</p>
+                <div className="space-y-6">
+                    <div className="group">
+                        <a href="https://bhumi.ngo/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Bhumi <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Education programs & volunteering</p>
                     </div>
-                    <div>
-                        <a href="https://unitedwaychennai.org/" target="_blank" className="font-bold text-primary-dark hover:underline flex items-center gap-2">United Way of Chennai <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Supports education & rural development</p>
+                    <div className="group">
+                        <a href="https://unitedwaychennai.org/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">United Way of Chennai <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Supports education, rural development & children welfare</p>
                     </div>
-                    <div>
-                        <a href="https://www.teameverest.india/" target="_blank" className="font-bold text-primary-dark hover:underline flex items-center gap-2">Team Everest <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Academic support & skill training</p>
+                    <div className="group">
+                        <a href="https://www.teameverest.india/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Team Everest <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Academic support & skill training for students</p>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                <h4 className="text-xl font-black text-dark mb-4 flex items-center gap-2">
-                    <span>🌍</span> Social Impact & Healthcare
+            <div className="space-y-6">
+                <h4 className="text-2xl font-black text-dark flex items-center gap-3">
+                    <span className="text-3xl">🐶</span> Animal Welfare NGOs
                 </h4>
-                <div className="space-y-4">
-                    <div>
-                        <a href="https://sevalaya.org/" target="_blank" className="font-bold text-secondary-dark hover:underline flex items-center gap-2">Sevalaya <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Works in education & healthcare</p>
+                <div className="space-y-6">
+                    <div className="group">
+                        <a href="https://bluecrossofindia.org/" target="_blank" className="text-xl font-bold text-secondary-dark hover:text-secondary flex items-center gap-2 transition-colors">Blue Cross of India <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Animal rescue, shelter, sterilization programs</p>
                     </div>
-                    <div>
-                        <a href="https://www.ekamfoundation.org/" target="_blank" className="font-bold text-secondary-dark hover:underline flex items-center gap-2">Ekam Foundation <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Healthcare support for children</p>
-                    </div>
-                    <div>
-                        <h5 className="font-bold text-dark flex items-center gap-2 mt-4"><span>🐶</span> Animal Welfare</h5>
-                        <a href="https://bluecrossofindia.org/" target="_blank" className="font-bold text-red-600 hover:underline flex items-center gap-2">Blue Cross of India <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Animal rescue & shelter programs</p>
+                </div>
+                
+                <h4 className="text-2xl font-black text-dark flex items-center gap-3 pt-4">
+                    <span className="text-3xl">🌍</span> Social Impact & Community NGOs
+                </h4>
+                <div className="space-y-6">
+                    <div className="group">
+                        <a href="https://sevalaya.org/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Sevalaya <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Works in education, healthcare, and rural upliftment</p>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                <h4 className="text-xl font-black text-dark mb-4 flex items-center gap-2">
-                    <span>🌱</span> Environment & Others
-                </h4>
-                <div className="space-y-4">
-                    <div>
-                        <a href="https://indiaenvironment.org/" target="_blank" className="font-bold text-green-600 hover:underline flex items-center gap-2">EFI <ExternalLink size={14}/></a>
-                        <p className="text-sm text-gray-500 font-medium">👉 Lake restoration & conservation</p>
+            <div className="space-y-6">
+                <div className="space-y-6 mt-12">
+                    <div className="group">
+                        <a href="https://www.ekamfoundation.org/" target="_blank" className="text-xl font-bold text-slate-800 hover:text-indigo-600 flex items-center gap-2 transition-colors">Ekam Foundation <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Healthcare support for children</p>
                     </div>
-                    <div className="p-4 bg-cream rounded-2xl border border-gray-200 mt-6">
-                        <p className="text-sm font-bold text-gray-600 italic">"Connecting these organizations directly to surplus food donors reduces waste and powers community service."</p>
+                    <div className="group">
+                        <a href="https://indiaenvironment.org/" target="_blank" className="text-xl font-bold text-green-700 hover:text-green-500 flex items-center gap-2 transition-colors">Environmental Foundation of India <ExternalLink size={16}/></a>
+                        <p className="text-gray-600 font-medium mt-1 italic">👉 Lake restoration, environmental conservation</p>
                     </div>
                 </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Impact Stats Section */}
-      <section className="py-24 bg-dark text-white relative overflow-hidden" id="impact">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[100px]"></div>
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary rounded-full blur-[100px]"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-5xl font-black tracking-tight mb-6">Our Growing Impact</h2>
-            <p className="text-xl text-gray-400 font-medium">Together, we are building a sustainable future where no good food gets left behind.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6 text-primary">
-                <Heart size={32} />
-              </div>
-              <div className="text-6xl font-black mb-2 tracking-tight">1.2M</div>
-              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Meals Rescued</div>
-            </motion.div>
-            
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} transition={{delay: 0.1}} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
-              <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6 text-secondary">
-                <ShieldCheck size={32} />
-              </div>
-              <div className="text-6xl font-black mb-2 tracking-tight">500+</div>
-              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Partner NGOs</div>
-            </motion.div>
-
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} transition={{delay: 0.2}} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6 text-primary">
-                <Leaf size={32} />
-              </div>
-              <div className="text-6xl font-black mb-2 tracking-tight">50k</div>
-              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Kg CO2 Saved</div>
-            </motion.div>
           </div>
         </div>
       </section>
@@ -424,6 +332,47 @@ export default function LandingPage() {
                    <div className="text-sm font-bold text-gray-500">NGO Partner</div>
                  </div>
                </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Impact Stats Section */}
+      <section className="py-24 bg-dark text-white relative overflow-hidden" id="impact">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary rounded-full blur-[100px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-5xl font-black tracking-tight mb-6">Our Growing Impact</h2>
+            <p className="text-xl text-gray-400 font-medium">Together, we are building a sustainable future where no good food gets left behind.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6 text-primary">
+                <Heart size={32} />
+              </div>
+              <div className="text-6xl font-black mb-2 tracking-tight">1.2M</div>
+              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Meals Rescued</div>
+            </motion.div>
+            
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} transition={{delay: 0.1}} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
+              <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6 text-secondary">
+                <ShieldCheck size={32} />
+              </div>
+              <div className="text-6xl font-black mb-2 tracking-tight">500+</div>
+              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Partner NGOs</div>
+            </motion.div>
+
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} transition={{delay: 0.2}} className="bg-white/5 border border-white/10 rounded-3xl p-10 text-center backdrop-blur-md">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6 text-primary">
+                <Leaf size={32} />
+              </div>
+              <div className="text-6xl font-black mb-2 tracking-tight">50k</div>
+              <div className="text-gray-400 font-bold uppercase tracking-widest text-sm">Kg CO2 Saved</div>
             </motion.div>
           </div>
         </div>
