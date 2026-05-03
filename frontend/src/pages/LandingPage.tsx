@@ -49,9 +49,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                <HeartHandshake className="w-6 h-6 text-white" />
-              </div>
+              <img src="/favicon.png" alt="HopeRise Logo" className="w-10 h-10 rounded-xl shadow-lg" />
               <span className={`text-2xl font-black tracking-tight ${scrolled ? 'text-dark' : 'text-white'}`}>
                 HopeRise
               </span>
@@ -164,7 +162,7 @@ export default function LandingPage() {
         </div>
       </section>
 
->
+
 
       {/* 5. How It Works */}
       <section className="py-24 bg-white border-y border-gray-100" id="how-it-works">
@@ -230,64 +228,101 @@ export default function LandingPage() {
             { id: "sevalaya", name: "Sevalaya", email: "sevalaya@sevalaya.org", location: "Education & Healthcare", website: "https://sevalaya.org/", lat: 13.1492, lng: 80.0811 },
             { id: "ekam", name: "Ekam Foundation", email: "info@ekamfoundation.org", location: "Healthcare for Children", website: "https://www.ekamfoundation.org/", lat: 13.0405, lng: 80.2337 },
             { id: "efi", name: "EFI", email: "info@indiaenvironment.org", location: "Environmental Conservation", website: "https://indiaenvironment.org/", lat: 12.9815, lng: 80.2184 }
-          ]} />
-
-
-
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <div className="space-y-6">
-                <h4 className="text-2xl font-black text-dark flex items-center gap-3">
-                    <span className="text-3xl">👶</span> Child Welfare & Education NGOs
-                </h4>
-                <div className="space-y-6">
-                    <div className="group">
-                        <a href="https://bhumi.ngo/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Bhumi <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Education programs & volunteering</p>
-                    </div>
-                    <div className="group">
-                        <a href="https://unitedwaychennai.org/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">United Way of Chennai <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Supports education, rural development & children welfare</p>
-                    </div>
-                    <div className="group">
-                        <a href="https://www.teameverest.india/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Team Everest <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Academic support & skill training for students</p>
-                    </div>
-                </div>
+          ]} />          <div className="mt-20">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <h3 className="text-3xl font-black text-dark tracking-tight mb-2">Our Community Impact Partners</h3>
+                <p className="text-lg text-gray-500 font-medium italic">Discover and support the incredible organizations we work with in Chennai.</p>
+              </div>
             </div>
 
-            <div className="space-y-6">
-                <h4 className="text-2xl font-black text-dark flex items-center gap-3">
-                    <span className="text-3xl">🐶</span> Animal Welfare NGOs
-                </h4>
-                <div className="space-y-6">
-                    <div className="group">
-                        <a href="https://bluecrossofindia.org/" target="_blank" className="text-xl font-bold text-secondary-dark hover:text-secondary flex items-center gap-2 transition-colors">Blue Cross of India <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Animal rescue, shelter, sterilization programs</p>
-                    </div>
-                </div>
-                
-                <h4 className="text-2xl font-black text-dark flex items-center gap-3 pt-4">
-                    <span className="text-3xl">🌍</span> Social Impact & Community NGOs
-                </h4>
-                <div className="space-y-6">
-                    <div className="group">
-                        <a href="https://sevalaya.org/" target="_blank" className="text-xl font-bold text-primary-dark hover:text-primary flex items-center gap-2 transition-colors">Sevalaya <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Works in education, healthcare, and rural upliftment</p>
-                    </div>
-                </div>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { 
+                  name: "Bhumi", 
+                  title: "Education & Volunteering",
+                  desc: "👉 One of India's largest independent youth volunteer non-profit organizations.", 
+                  site: "https://bhumi.ngo/",
+                  icon: "👶",
+                  gradient: "from-emerald-50 to-green-50",
+                  textColor: "text-emerald-700"
+                },
+                { 
+                  name: "United Way", 
+                  title: "Rural Development",
+                  desc: "👉 Improving lives by mobilizing the caring power of communities in Chennai.", 
+                  site: "https://unitedwaychennai.org/",
+                  icon: "🤝",
+                  gradient: "from-blue-50 to-indigo-50",
+                  textColor: "text-blue-700"
+                },
+                { 
+                  name: "Team Everest", 
+                  title: "Academic Support",
+                  desc: "👉 Providing academic support and skill training for children across various centers.", 
+                  site: "https://www.teameverest.india/",
+                  icon: "🏔️",
+                  gradient: "from-orange-50 to-yellow-50",
+                  textColor: "text-orange-700"
+                },
+                { 
+                  name: "Blue Cross", 
+                  title: "Animal Welfare",
+                  desc: "👉 Rescuing, sheltering, and providing sterilization programs for Chennai's animals.", 
+                  site: "https://bluecrossofindia.org/",
+                  icon: "🐶",
+                  gradient: "from-red-50 to-rose-50",
+                  textColor: "text-red-700"
+                },
+                { 
+                  name: "Sevalaya", 
+                  title: "Social Transformation",
+                  desc: "👉 Running schools, orphanages, and old age homes with a focus on rural upliftment.", 
+                  site: "https://sevalaya.org/",
+                  icon: "🌍",
+                  gradient: "from-teal-50 to-cyan-50",
+                  textColor: "text-teal-700"
+                },
+                { 
+                  name: "Ekam Foundation", 
+                  title: "Child Healthcare",
+                  desc: "👉 A community-led NGO providing quality healthcare to needy children and mothers.", 
+                  site: "https://www.ekamfoundation.org/",
+                  icon: "🏥",
+                  gradient: "from-purple-50 to-indigo-50",
+                  textColor: "text-indigo-700"
+                }
+              ].map((ngo, idx) => (
+                <motion.div 
+                  key={ngo.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -10 }}
+                  className={`relative group h-[340px] rounded-[40px] p-8 bg-gradient-to-br ${ngo.gradient} border border-white overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500`}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                  
+                  <div className="text-5xl mb-6 transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">{ngo.icon}</div>
+                  
+                  <div className="relative z-10">
+                    <h4 className={`text-2xl font-black ${ngo.textColor} mb-1`}>{ngo.name}</h4>
+                    <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">{ngo.title}</p>
+                    <p className="text-gray-600 font-medium leading-relaxed italic line-clamp-3 mb-8">
+                      {ngo.desc}
+                    </p>
+                  </div>
 
-            <div className="space-y-6">
-                <div className="space-y-6 mt-12">
-                    <div className="group">
-                        <a href="https://www.ekamfoundation.org/" target="_blank" className="text-xl font-bold text-slate-800 hover:text-indigo-600 flex items-center gap-2 transition-colors">Ekam Foundation <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Healthcare support for children</p>
-                    </div>
-                    <div className="group">
-                        <a href="https://indiaenvironment.org/" target="_blank" className="text-xl font-bold text-green-700 hover:text-green-500 flex items-center gap-2 transition-colors">Environmental Foundation of India <ExternalLink size={16}/></a>
-                        <p className="text-gray-600 font-medium mt-1 italic">👉 Lake restoration, environmental conservation</p>
-                    </div>
-                </div>
+                  <a 
+                    href={ngo.site} 
+                    target="_blank" 
+                    className="absolute bottom-8 right-8 w-14 h-14 rounded-full bg-white flex items-center justify-center text-dark shadow-lg group-hover:bg-dark group-hover:text-white transition-all duration-300"
+                  >
+                    <ExternalLink size={20} />
+                  </a>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
@@ -406,7 +441,7 @@ export default function LandingPage() {
               <ul className="space-y-4">
                 <li><a href="#" className="text-gray-500 hover:text-primary font-medium transition-colors">Contact Us</a></li>
                 <li><a href="#" className="text-gray-500 hover:text-primary font-medium transition-colors">Twitter</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-primary font-medium transition-colors">Instagram</a></li>
+                <li><a href="https://www.instagram.com/_hoperise_" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary font-medium transition-colors">Instagram</a></li>
               </ul>
             </div>
           </div>

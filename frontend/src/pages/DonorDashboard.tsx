@@ -18,6 +18,10 @@ export default function DonorDashboard() {
   const [expiry, setExpiry] = useState('');
   const [updatingAddress, setUpdatingAddress] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  // Live map center — initialized from stored profile, updated on address change
+  const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | undefined>(
+    user?.lat && user?.lng ? { lat: user.lat, lng: user.lng } : undefined
+  );
   
   // Address Modal State
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -101,10 +105,18 @@ export default function DonorDashboard() {
     const combinedAddress = `${addrLine1}, ${addrLine2 ? addrLine2 + ', ' : ''}${addrCity}, ${addrState}, ${addrZip}`;
     
     try {
-        await api.put('/users/update_me', { location: combinedAddress });
-        alert("Your operating address and GPS coordinate signature has been successfully updated on the map!");
+        const response = await api.put('/users/update_me', { location: combinedAddress });
+        const updatedUser = response.data;
+
+        // Immediately move the map marker to the new geocoded coordinates
+        if (updatedUser.lat && updatedUser.lng) {
+          setMapCenter({ lat: updatedUser.lat, lng: updatedUser.lng });
+        }
+
+        alert(`Address updated! Map marker moved to: ${combinedAddress}`);
         setIsAddressModalOpen(false);
-        window.location.reload(); 
+        // Reset form fields
+        setAddrLine1(''); setAddrLine2(''); setAddrCity(''); setAddrState(''); setAddrZip('');
     } catch (err) {
         alert("Failed to update address. Please try again.");
     }
@@ -335,7 +347,7 @@ export default function DonorDashboard() {
               <p className="text-gray-500 font-medium">Use the map to see NGOs actively receiving donations in the city.</p>
             </div>
           </div>
-          <NgoMap ngos={ngos} />
+          <NgoMap ngos={ngos} userLocation={mapCenter} />
         </motion.div>
       </main>
 

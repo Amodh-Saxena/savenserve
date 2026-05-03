@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: savenserve-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a secure random value
+      - key: FIREBASE_SERVICE_ACCOUNT_KEY_JSON
+        sync: false                  # You must paste this manually in the Render dashboard
+      - key: ALLOWED_ORIGINS
+        sync: false                  # Set to your Vercel URL after frontend is deployed

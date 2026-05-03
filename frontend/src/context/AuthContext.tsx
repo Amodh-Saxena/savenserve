@@ -10,6 +10,8 @@ interface User {
   role: 'donor' | 'ngo' | 'admin';
   name?: string;
   location?: string;
+  lat?: number;
+  lng?: number;
 }
 
 interface AuthContextType {
@@ -29,31 +31,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const idToken = await firebaseUser.getIdToken();
-        setToken(idToken);
-        localStorage.setItem('token', idToken);
-        
-        // Fetch user metadata from Firestore
-        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as User;
-          userData.id = firebaseUser.uid;
-          setUser(userData);
+      try {
+        if (firebaseUser) {
+          const idToken = await firebaseUser.getIdToken();
+          setToken(idToken);
+          localStorage.setItem('token', idToken);
+          
+          try {
+            // Fetch user metadata from Firestore
+            const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data() as User;
+              userData.id = firebaseUser.uid;
+              setUser(userData);
+            } else {
+              // New user or metadata missing
+              setUser({
+                id: firebaseUser.uid,
+                email: firebaseUser.email || '',
+                role: 'donor', // Default if missing
+              });
+            }
+          } catch (firestoreError) {
+            console.error("Firestore data fetch error:", firestoreError);
+            // Fallback to minimal user object to prevent redirect loops
+            setUser({
+              id: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              role: 'donor',
+            });
+          }
         } else {
-          // New user or metadata missing
-          setUser({
-            id: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            role: 'donor', // Default if missing
-          });
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('token');
         }
-      } else {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem('token');
+      } catch (authError) {
+        console.error("Auth state change error:", authError);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();

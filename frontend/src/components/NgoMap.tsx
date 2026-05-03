@@ -1,73 +1,63 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Loader2, Navigation, AlertCircle } from 'lucide-react';
+import { resolveCoordinates, CHENNAI_DEFAULT } from '../services/geocoding';
 
 declare global {
-  interface Window {
-    mappls: any;
-  }
+  interface Window { mappls: any; }
 }
 
 interface NgoMapProps {
-  ngos: any[]; // The list of NGOs to display
+  ngos: any[];
+  userLocation?: { lat: number; lng: number };
 }
 
-interface UserLocation {
-  lat: number;
-  lng: number;
-}
+// Real Chennai NGO demo data shown when the database has no NGO records
+const DEMO_NGOS = [
+  { id: 'demo_irf',    name: 'Indian Relief Foundation',  email: 'contact@irf.org.in',         location: 'T. Nagar, Chennai, Tamil Nadu 600017',      lat: 13.0674, lng: 80.2376 },
+  { id: 'demo_goonj',  name: 'Goonj Chennai',             email: 'chennai@goonj.org',           location: 'Anna Nagar, Chennai, Tamil Nadu 600040',    lat: 13.1186, lng: 80.2324 },
+  { id: 'demo_aksha',  name: 'Akshaya Patra Foundation',  email: 'chennai@akshayapatra.org',    location: 'Adyar, Chennai, Tamil Nadu 600020',         lat: 13.0100, lng: 80.2341 },
+];
 
-export default function NgoMap({ ngos }: NgoMapProps) {
+export default function NgoMap({ ngos, userLocation }: NgoMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapObject, setMapObject] = useState<any>(null);
-  const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
+  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const markersRef = useRef<{ [key: string]: any }>({});
   const mapInitialized = useRef(false);
 
-  // 1. Get User Location (Coordinates)
+  // 1. Resolve user location — profile > browser GPS > IP geo > Chennai default
   useEffect(() => {
-    const fetchLocation = async () => {
-      // Prompt user for HTML5 Geolocation
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLoc({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
-          },
-          async (err) => {
-            console.warn("Geolocation denied or failed. Falling back to IP-based location...", err);
-            // Fallback to IP standard geolocation
-            try {
-              const res = await fetch('https://ipapi.co/json/');
-              const data = await res.json();
-              if (data.latitude && data.longitude) {
-                setUserLoc({ lat: data.latitude, lng: data.longitude });
-              } else {
-                throw new Error("Invalid IP geo data");
-              }
-            } catch (ipErr) {
-              // Final fallback: Coordinates of Delhi
-              setUserLoc({ lat: 28.6139, lng: 77.2090 });
-            }
-          },
-          { timeout: 10000 }
-        );
-      } else {
-        // Fallback: Coordinates of Delhi
-        setUserLoc({ lat: 28.6139, lng: 77.2090 });
-      }
-    };
+    if (userLocation) {
+      setUserLoc(userLocation);
+      return;
+    }
 
-    fetchLocation();
-  }, []);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        async () => {
+          try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            setUserLoc(data.latitude && data.longitude
+              ? { lat: data.latitude, lng: data.longitude }
+              : CHENNAI_DEFAULT);
+          } catch {
+            setUserLoc(CHENNAI_DEFAULT);
+          }
+        },
+        { timeout: 10000 }
+      );
+    } else {
+      setUserLoc(CHENNAI_DEFAULT);
+    }
+  }, [userLocation]);
 
-  // 2. Initialize Mappls Map once we have the user location
+  // 2. Initialize Mappls Map once we have coordinates (only once)
   useEffect(() => {
-    if (!userLoc || !mapContainerRef.current) return;
+    if (!userLoc || !mapContainerRef.current || mapInitialized.current) return;
 
     const checkMappls = setInterval(() => {
       if (window.mappls) {
@@ -80,90 +70,69 @@ export default function NgoMap({ ngos }: NgoMapProps) {
       if (mapInitialized.current) return;
       mapInitialized.current = true;
       try {
-         const map = new window.mappls.Map(mapContainerRef.current, {
-           center: [userLoc.lat, userLoc.lng],
-           zoom: 12,
-         });
-
-         // Add a marker for the current user
-         new window.mappls.Marker({
-            map: map,
-            position: { lat: userLoc.lat, lng: userLoc.lng },
-            popupHtml: "<div style='padding: 10px; font-weight: bold;'>You are here</div>"
-         });
-
-         setMapObject(map);
-         setLoading(false);
-      } catch (err) {
-         console.error("Map initialization failed", err);
-         setError("Failed to load map interface.");
-         setLoading(false);
+        const map = new window.mappls.Map(mapContainerRef.current, {
+          center: [userLoc.lat, userLoc.lng],
+          zoom: 12,
+        });
+        new window.mappls.Marker({
+          map,
+          position: { lat: userLoc.lat, lng: userLoc.lng },
+          popupHtml: "<div style='padding:10px;font-weight:bold;'>Your Location</div>",
+        });
+        setMapObject(map);
+        setLoading(false);
+      } catch {
+        setError('Failed to load map interface.');
+        setLoading(false);
       }
     };
 
     return () => clearInterval(checkMappls);
   }, [userLoc]);
 
-  // 3. Mark the NGOs on the map
+  // 2b. Re-centre map when userLoc changes after init
   useEffect(() => {
-    if (!mapObject || !ngos || ngos.length === 0 || !userLoc) return;
+    if (!mapObject || !userLoc || !mapInitialized.current) return;
+    mapObject.setCenter([userLoc.lat, userLoc.lng]);
+  }, [mapObject, userLoc]);
 
-    const activeIds = new Set<string>();
+  // 3. Plot NGO markers — uses pincode from location string for geocoding
+  useEffect(() => {
+    if (!mapObject || !userLoc) return;
 
-    // If DB is completely empty (no NGOs signed up yet), provide fallback demo models so the map doesn't look broken
-    const localNgos = ngos.length > 0 ? ngos : [
-      { id: "demo_1", name: "SafeHaven Shelter", email: "contact@safehaven.org", location: "Downtown Central" },
-      { id: "demo_2", name: "Community Kitchen", email: "hello@kitchen.org", location: "North District" },
-      { id: "demo_3", name: "Food Rescue East", email: "east@rescue.org", location: "Eastside" }
-    ];
+    const displayNgos = ngos.length > 0 ? ngos : DEMO_NGOS;
+    const activeIds = new Set<string>(displayNgos.map(n => n.id || n.email));
 
-    localNgos.forEach((ngo) => {
-      const id = ngo.id || ngo.email || Math.random().toString();
-      activeIds.add(id);
-
-      let ngoLat = userLoc.lat;
-      let ngoLng = userLoc.lng;
-
-      if (ngo.lat && ngo.lng) {
-          // Absolute True Coordinates from Mappls Geocoding
-          ngoLat = ngo.lat;
-          ngoLng = ngo.lng;
-      } else {
-          // Fallback legacy offset if DB misses coordinates
-          const seed = id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-          const latOffset = (Math.sin(seed) * 0.02); 
-          const lngOffset = (Math.cos(seed) * 0.02);
-          ngoLat += latOffset;
-          ngoLng += lngOffset;
-      }
-
-      const html = `<div style="padding: 10px; font-family: sans-serif;">
-        <h3 style="font-weight: 900; color: #4f46e5; margin-bottom: 5px;">${ngo.name || 'Local NGO'}</h3>
-        <p style="font-size: 12px; color: #4b5563;">${ngo.email || 'ngo@example.com'}</p>
-        <p style="font-size: 12px; font-weight: 600; margin-top: 5px;">Address: ${ngo.location || 'Local'}</p>
-        ${ngo.website ? `<a href="${ngo.website}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 800; color: white; background: #4f46e5; padding: 5px 10px; border-radius: 5px; text-decoration: none;">Visit Website</a>` : ''}
-      </div>`;
-
-      if (markersRef.current[id]) {
-         markersRef.current[id].setPosition({ lat: ngoLat, lng: ngoLng });
-      } else {
-         const marker = new window.mappls.Marker({
-           map: mapObject,
-           position: { lat: ngoLat, lng: ngoLng },
-           popupHtml: html,
-           icon: 'https://apis.mapmyindia.com/map_v3/1.png'
-         });
-         markersRef.current[id] = marker;
-      }
-    });
-
+    // Remove stale markers
     Object.keys(markersRef.current).forEach(id => {
-        if (!activeIds.has(id)) {
-            markersRef.current[id].remove();
-            delete markersRef.current[id];
-        }
+      if (!activeIds.has(id)) {
+        markersRef.current[id].remove();
+        delete markersRef.current[id];
+      }
     });
 
+    displayNgos.forEach(async (ngo) => {
+      const id = ngo.id || ngo.email || String(Math.random());
+      if (markersRef.current[id]) return;
+
+      // Resolve using pincode from location string → stored lat/lng → fallback
+      const coords = await resolveCoordinates(ngo.lat, ngo.lng, ngo.location, id);
+      if (!mapObject) return;
+
+      const popupHtml = `
+        <div style="padding:10px;font-family:sans-serif;width:210px;">
+          <h3 style="font-weight:900;color:#4f46e5;margin-bottom:5px;">${ngo.name || 'Local NGO'}</h3>
+          <p style="font-size:12px;color:#4b5563;margin-bottom:4px;">${ngo.email || ''}</p>
+          <p style="font-size:12px;font-weight:600;margin-top:5px;">📍 ${ngo.location || 'Chennai, Tamil Nadu'}</p>
+          ${ngo.website ? `<a href="${ngo.website}" target="_blank" style="display:inline-block;margin-top:10px;font-size:11px;font-weight:800;color:white;background:#4f46e5;padding:5px 10px;border-radius:5px;text-decoration:none;">Visit Website</a>` : ''}
+        </div>`;
+
+      markersRef.current[id] = new window.mappls.Marker({
+        map: mapObject,
+        position: coords,
+        popupHtml: popupHtml,
+      });
+    });
   }, [mapObject, ngos, userLoc]);
 
   if (error) {
@@ -185,13 +154,7 @@ export default function NgoMap({ ngos }: NgoMapProps) {
           </p>
         </div>
       )}
-      
-      {/* MapmyIndia Mount Point */}
-      <div 
-        ref={mapContainerRef} 
-        id="mappls-map" 
-        className="w-full h-full"
-      ></div>
+      <div ref={mapContainerRef} id="mappls-map" className="w-full h-full"></div>
     </div>
   );
 }

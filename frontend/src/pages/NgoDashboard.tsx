@@ -3,13 +3,17 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { sendDynamicEmail } from '../services/emailService';
-import { LogOut, MapPin, Clock, Heart, Globe, Activity } from 'lucide-react';
+import { LogOut, MapPin, Clock, Heart, Globe, Activity, Package } from 'lucide-react';
 import RealTimeDonationMap from '../components/RealTimeDonationMap';
 
 export default function NgoDashboard() {
   const { user, logout } = useAuth();
   const [foods, setFoods] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  // Live map center — initialized from stored profile, updated on address change
+  const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | undefined>(
+    user?.lat && user?.lng ? { lat: user.lat, lng: user.lng } : undefined
+  );
 
   useEffect(() => {
     api.get('/foods/')
@@ -119,10 +123,18 @@ export default function NgoDashboard() {
     const combinedAddress = `${addrLine1}, ${addrLine2 ? addrLine2 + ', ' : ''}${addrCity}, ${addrState}, ${addrZip}`;
     
     try {
-        await api.put('/users/update_me', { location: combinedAddress });
-        alert("Your operating address and GPS coordinate signature has been successfully updated on the map!");
+        const response = await api.put('/users/update_me', { location: combinedAddress });
+        const updatedUser = response.data;
+        
+        // Immediately move the map marker to the new geocoded coordinates
+        if (updatedUser.lat && updatedUser.lng) {
+          setMapCenter({ lat: updatedUser.lat, lng: updatedUser.lng });
+        }
+        
+        alert(`Address updated! Map marker moved to: ${combinedAddress}`);
         setIsAddressModalOpen(false);
-        window.location.reload(); 
+        // Reset form fields
+        setAddrLine1(''); setAddrLine2(''); setAddrCity(''); setAddrState(''); setAddrZip('');
     } catch (err: any) {
         const detail = err.response?.data?.detail || err.message || "Unknown error";
         alert("Failed to update address. Server says: " + detail);
@@ -193,7 +205,11 @@ export default function NgoDashboard() {
                     <Activity className="text-indigo-400 animate-pulse" size={16} />
                     LIVE SATELLITE TRACKING
                 </div>
-                <RealTimeDonationMap donors={donorList} />
+                <RealTimeDonationMap 
+                  donors={donorList} 
+                  foods={foods} 
+                  userLocation={mapCenter}
+                />
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-10 border-t border-slate-200">

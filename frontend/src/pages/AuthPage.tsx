@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -15,18 +15,25 @@ export default function AuthPage() {
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Navigate to dashboard once auth state is confirmed (avoids double-reload)
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSubmitting(true);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        navigate('/dashboard');
+        // Navigation is handled by the useEffect watching auth state
       } else {
         // Register securely on backend so the Mapmyindia APIs can physically Geocode the string!
         // We bypass direct Frontend Firestore 'setDoc' so the backend can attach "lat" & "lng" properties.
@@ -48,7 +55,7 @@ export default function AuthPage() {
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     }
-    setLoading(false);
+    setSubmitting(false);
   };
 
   return (
@@ -73,8 +80,8 @@ export default function AuthPage() {
         <motion.div
            {...({ initial: { opacity: 0, y: -20 }, animate: { opacity: 1, y: 0 }, className: "text-center" } as any)}
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-emerald-600 shadow-xl shadow-primary/20 mb-6">
-            <Heart className="w-10 h-10 text-white fill-current" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white shadow-xl shadow-gray-200/50 mb-6 overflow-hidden border border-gray-100">
+            <img src="/favicon.png" alt="HopeRise Logo" className="w-16 h-16 object-contain" />
           </div>
           <h2 className="text-4xl font-black text-dark tracking-tight">
             {isLogin ? 'Welcome Back' : 'Join the Mission'}
@@ -205,10 +212,10 @@ export default function AuthPage() {
               <div>
                 <button 
                   type="submit" 
-                  disabled={loading}
+                  disabled={submitting}
                   className="w-full flex justify-center items-center py-4 px-4 bg-gradient-to-r from-primary to-primary-dark rounded-2xl shadow-lg shadow-primary/30 text-lg font-black text-white hover:translate-y-[-2px] hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-50"
                 >
-                  {loading ? 'Please Wait...' : isLogin ? (
+                  {submitting ? 'Please Wait...' : isLogin ? (
                     <>
                       Sign In <LogIn className="ml-2 w-5 h-5" />
                     </>
