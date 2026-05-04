@@ -7,8 +7,10 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: SECRET_KEY
-        generateValue: true          # Render auto-generates a secure random value
+        generateValue: true
+      - key: MONGODB_URL
+        sync: false           # Paste your MongoDB Atlas connection string
       - key: FIREBASE_SERVICE_ACCOUNT_KEY_JSON
-        sync: false                  # You must paste this manually in the Render dashboard
+        sync: false           # Paste the contents of serviceAccountKey.json
       - key: ALLOWED_ORIGINS
-        sync: false                  # Set to your Vercel URL after frontend is deployed
+        sync: false           # Set to your Netlify URL after frontend deploy

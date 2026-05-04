@@ -7,3 +7,4 @@ python-jose[cryptography]==3.3.0
 firebase-admin==6.2.0
 python-multipart==0.0.6
 email-validator
+pymongo[srv]==4.6.1
