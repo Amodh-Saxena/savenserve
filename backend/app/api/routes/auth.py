@@ -34,13 +34,12 @@ def register(user_in: UserCreate):
             display_name=user_in.name
         )
         
-        # Perform synchronous Geocoding on Mapmyindia
-        lat, lng = (None, None)
+        # Perform synchronous Geocoding
+        lat, lng = (user_in.lat, user_in.lng)
         if user_in.location:
-             lat, lng = geocode_address(user_in.location)
-             if not lat:
-                 # Block Registration if MapmyIndia rejects the address parameters
-                 raise HTTPException(status_code=400, detail="Address could not be verified on the Map. Please provide a more precise tracking address.")
+             mc_lat, mc_lng = geocode_address(user_in.location)
+             if mc_lat:
+                 lat, lng = mc_lat, mc_lng
 
         user_data = {
             "email": user_in.email,
