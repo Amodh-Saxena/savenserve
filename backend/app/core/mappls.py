@@ -33,10 +33,6 @@ def geocode_address(address: str):
     if not address or address.strip() == "":
         return None, None
         
-    encoded_address = urllib.parse.quote(address)
-    url = f"https://nominatim.openstreetmap.org/search?q={encoded_address}&format=json&limit=1"
-    import requests
-    # OpenStreetMap Nominatim
     url = "https://nominatim.openstreetmap.org/search"
     headers = {"User-Agent": "FoodRedistributionApp/1.0"}
     
@@ -46,13 +42,19 @@ def geocode_address(address: str):
         # Iteratively try searching by removing the most specific parts (e.g. "Apt 4B")
         for i in range(len(parts)):
             query = ", ".join(parts[i:])
-            params = {"q": query, "format": "json", "limit": 1}
-            response = requests.get(url, params=params, headers=headers)
+            params = urllib.parse.urlencode({"q": query, "format": "json", "limit": 1})
+            full_url = f"{url}?{params}"
             
-            if response.status_code == 200:
-                data = response.json()
-                if data and len(data) > 0:
-                    return float(data[0]['lat']), float(data[0]['lon'])
+            req = urllib.request.Request(full_url, headers=headers)
+            try:
+                with urllib.request.urlopen(req) as response:
+                    if response.status == 200:
+                        data = json.loads(response.read().decode())
+                        if data and len(data) > 0:
+                            return float(data[0]['lat']), float(data[0]['lon'])
+            except Exception as e:
+                print(f"Geocoding request error: {e}")
+                pass
     except Exception as e:
         print(f"Geocoding error: {e}")
         pass
