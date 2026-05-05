@@ -9,13 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SERVICE_ACCOUNT_KEY_PATH = str(BASE_DIR / "serviceAccountKey.json")
 
 def initialize_firebase():
-    """Initializes the Firebase Admin SDK.
-
-    Supports two modes:
-    1. FIREBASE_SERVICE_ACCOUNT_KEY_JSON env var (production on Render) —
-       contains the entire serviceAccountKey.json content as a JSON string.
-    2. serviceAccountKey.json file on disk (local development fallback).
-    """
+    """Initializes the Firebase Admin SDK."""
     if not firebase_admin._apps:
         key_json_str = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_JSON")
         if key_json_str:
@@ -28,8 +22,10 @@ def initialize_firebase():
             cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_PATH)
             firebase_admin.initialize_app(cred)
         else:
-            # Last resort: use application default credentials (e.g. GCP environment)
-            firebase_admin.initialize_app()
+            raise ValueError(
+                "CRITICAL ERROR: FIREBASE_SERVICE_ACCOUNT_KEY_JSON is missing! "
+                "You must add it in the Render Environment Variables tab."
+            )
 
 def get_db():
     """Returns a Firestore client."""
